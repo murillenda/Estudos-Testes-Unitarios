@@ -15,7 +15,13 @@ class FiltroNumerosTest {
         List<Integer> numerosParesEsperados = Arrays.asList(2, 4);
         List<Integer> resultadoFiltro = FiltroNumeros.numerosPares(numeros);
 
+        // Faz a verificação tanto do conteúdo quanto da ordem
+        // Usa o método equals do próprio objeto (Precisa estar com equals implementado para funcionar corretamente)
+        // Usado para Collections
         assertIterableEquals(numerosParesEsperados, resultadoFiltro);
+
+        // Usado para arrays, no geral igual ao iterable
+        assertArrayEquals(numerosParesEsperados.toArray(new Object[]{}), resultadoFiltro.toArray(new Object[]{}));
     }
 
 }
