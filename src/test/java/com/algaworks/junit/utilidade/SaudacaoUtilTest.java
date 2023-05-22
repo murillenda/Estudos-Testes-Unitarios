@@ -1,6 +1,7 @@
 package com.algaworks.junit.utilidade;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -45,14 +46,18 @@ class SaudacaoUtilTest {
 
     @Test
     void deveLancarException() {
-        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
-                () -> SaudacaoUtil.saudar(-10));
-        assertEquals("Hora inválida", illegalArgumentException.getMessage());
+        int horaInvalida = -10;
+        // Executable do Jupiter
+        Executable chamadaInvalidaDeMetodo = () -> SaudacaoUtil.saudar(horaInvalida);
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, chamadaInvalidaDeMetodo);
+        assertEquals("Hora inválida", e.getMessage());
     }
 
     @Test
     void naoDeveLancarException() {
-        assertDoesNotThrow(() -> SaudacaoUtil.saudar(0));
+        int horaValida = 0;
+        Executable chamadaValidaDeMetodo = () -> SaudacaoUtil.saudar(horaValida);
+        assertDoesNotThrow(chamadaValidaDeMetodo);
     }
 
 }
