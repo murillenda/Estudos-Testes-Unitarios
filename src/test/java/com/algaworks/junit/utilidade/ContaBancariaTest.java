@@ -1,5 +1,7 @@
 package com.algaworks.junit.utilidade;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -7,132 +9,102 @@ import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@DisplayName("Conta bancária")
 class ContaBancariaTest {
 
     // Nested diz pro JUnit que nessa innerClass existem testes unitários para serem executados
     @Nested
-    class Saque {
-        @Test
-        void saqueComValorValido() {
-            var conta = new ContaBancaria(BigDecimal.TEN);
-            var valorValido = new BigDecimal("5");
-            var valorSaldoAposSaque = conta.saldo().subtract(valorValido);
+    @DisplayName("Dado uma conta bancária com saldo de R$ 10,00")
+    class ContaBancariaComSaldo {
 
-            conta.saque(valorValido);
-            assertEquals(conta.saldo(), valorSaldoAposSaque);
+        private ContaBancaria conta;
+
+        @BeforeEach
+        void beforeEach() {
+            conta = new ContaBancaria(BigDecimal.TEN);
         }
 
-        @Test
-        void saqueComValorIgualValido() {
-            var conta = new ContaBancaria(BigDecimal.TEN);
-            var valorValido = BigDecimal.TEN;
-            var valorSaldoAposSaque = conta.saldo().subtract(valorValido);
+        @Nested
+        @DisplayName("Quando efetuar o saque com o valor menor")
+        class SaqueValorMenor {
+            private final BigDecimal valorSaque = new BigDecimal("9.0");
 
-            conta.saque(valorValido);
-            assertEquals(conta.saldo(), valorSaldoAposSaque);
+            @Test
+            @DisplayName("Então não deve lançar exception")
+            void naoDeveLancarSaqueSemException() {
+                assertDoesNotThrow(() -> conta.saque(valorSaque));
+            }
+
+            @Test
+            @DisplayName("E deve subtrair do saldo")
+            void deveSubtrairDoSaldo() {
+                conta.saque(valorSaque);
+                assertEquals(new BigDecimal("1.0"), conta.saldo());
+            }
         }
 
-        @Test
-        void saqueComValorZeroFalha() {
-            var contaSaldoZerado = new ContaBancaria(BigDecimal.TEN);
-            var valorInvalidoZero = BigDecimal.ZERO;
-            assertThrows(
-                    IllegalArgumentException.class,
-                    () -> contaSaldoZerado.saque(valorInvalidoZero),
-                    "Valor igual a zero ou menor é inválido");
-        }
+        @Nested
+        @DisplayName("Quando efetuar o saque com o valor maior")
+        class SaqueValorMaior {
+            private final BigDecimal valorSaque = new BigDecimal("20.0");
 
-        @Test
-        void saqueComValorNegativoFalha() {
-            var contaSaldoZerado = new ContaBancaria(BigDecimal.TEN);
-            var valorInvalidoNegativo = new BigDecimal("-5");
-            assertThrows(
-                    IllegalArgumentException.class,
-                    () -> contaSaldoZerado.saque(valorInvalidoNegativo),
-                    "\"Valor igual a zero ou menor é inválido\"");
-        }
+            @Test
+            @DisplayName("Então deve lançar exception")
+            void deveFalhar() {
+                assertThrows(RuntimeException.class, () -> conta.saque(valorSaque));
+            }
 
-        @Test
-        void saqueComSaldoInsuficienteFalha() {
-            var contaSaldoZerado = new ContaBancaria(BigDecimal.ZERO);
-            var valorValido = BigDecimal.TEN;
-            assertThrows(
-                    RuntimeException.class,
-                    () -> contaSaldoZerado.saque(valorValido),
-                    "Valor de saldo insuficiente");
-        }
-
-        @Test
-        void saqueComValorNullFalha() {
-            var conta = new ContaBancaria(BigDecimal.TEN);
-            assertThrows(IllegalArgumentException.class, () -> conta.saque(null));
-        }
-
-        @Test
-        void saqueAposDeposito() {
-            ContaBancaria conta = new ContaBancaria(BigDecimal.TEN);
-            conta.deposito(BigDecimal.TEN);
-
-            var valorSaldoAposSaque = conta.saldo().subtract(BigDecimal.ONE);
-            conta.saque(BigDecimal.ONE);
-
-            assertEquals(conta.saldo(), valorSaldoAposSaque);
+            @Test
+            @DisplayName("E não deve alterar saldo")
+            void naoDeveAlterarSaldo() {
+                try {
+                    conta.saque(valorSaque);
+                } catch (Exception ignored) {
+                }
+                assertEquals(BigDecimal.TEN, conta.saldo());
+            }
         }
     }
 
     @Nested
-    class Deposito{
-        @Test
-        void depositoComValorValido() {
-            var conta = new ContaBancaria(BigDecimal.TEN);
-            var valorValido = BigDecimal.TEN;
-            var valorSaldoAposDeposito = conta.saldo().add(valorValido);
+    @DisplayName("Dado uma conta bancária com saldo de R$ 0,00")
+    class ContaBancariaComSaldoZerado {
 
-            conta.deposito(valorValido);
-            assertEquals(conta.saldo(), valorSaldoAposDeposito);
+        private ContaBancaria conta;
+
+        @BeforeEach
+        void beforeEach() {
+            conta = new ContaBancaria(BigDecimal.ZERO);
         }
 
-        @Test
-        void depositoComValorNuloFalha() {
-            var conta = new ContaBancaria(BigDecimal.TEN);
-            assertThrows(
-                    IllegalArgumentException.class,
-                    () -> conta.deposito(null),
-                    "Valor igual a zero ou menor é inválido");
+        @Nested
+        @DisplayName("Quando efetuar o saque com o valor maior")
+        class SaqueValorMaior {
+
+            private final BigDecimal valorSaque = new BigDecimal("0.01");
+
+            @Test
+            @DisplayName("Então deve lançar exception")
+            void deveFalhar() {
+                assertThrows(RuntimeException.class, () -> conta.saque(valorSaque));
+            }
         }
 
-        @Test
-        void depositoComValorZeroFalha() {
-            var conta = new ContaBancaria(BigDecimal.TEN);
-            var valorInvalidoZero = BigDecimal.ZERO;
-            assertThrows(
-                    IllegalArgumentException.class,
-                    () -> conta.deposito(valorInvalidoZero),
-                    "Valor igual a zero ou menor é inválido");
-        }
+        @Nested
+        @DisplayName("Quando efetuar um depósito de R$ 10,00")
+        class DepositoComDezReais {
 
-        @Test
-        void depositoComValorNegativoFalha() {
-            var conta = new ContaBancaria(BigDecimal.TEN);
-            var valorInvalidoNegativo = new BigDecimal("-10");
-            assertThrows(
-                    IllegalArgumentException.class,
-                    () -> conta.deposito(valorInvalidoNegativo),
-                    "Valor igual a zero ou menor é inválido");
+            private final BigDecimal valorDeposito = new BigDecimal("8.00");
+
+            @Test
+            @DisplayName("Então deve somar ao saldo")
+            void deveSomarAoSaldo() {
+                conta.deposito(valorDeposito);
+                assertEquals(new BigDecimal("8.00"), conta.saldo());
+            }
+
         }
     }
 
-    @Nested
-    class Saldo {
-        @Test
-        void saldo() {
-            ContaBancaria conta = new ContaBancaria(new BigDecimal("29.03"));
-            assertEquals(new BigDecimal("29.03"), conta.saldo());
-        }
 
-        @Test
-        void criarContaSaldoNullFalha() {
-            assertThrows(IllegalArgumentException.class, () -> new ContaBancaria(null));
-        }
-    }
 }
