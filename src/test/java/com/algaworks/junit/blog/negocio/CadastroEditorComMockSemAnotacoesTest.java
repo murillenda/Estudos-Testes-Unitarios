@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-class CadastroEditorComMockTest {
+class CadastroEditorComMockSemAnotacoesTest {
 
     CadastroEditor cadastroEditor;
     Editor editor;
