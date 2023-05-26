@@ -4,9 +4,7 @@ import com.algaworks.junit.blog.armazenamento.ArmazenamentoEditor;
 import com.algaworks.junit.blog.modelo.Editor;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
@@ -19,6 +17,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class CadastroEditorComMockComAnotacoesTest {
 
     Editor editor;
+
+    @Captor
+    ArgumentCaptor<Mensagem> mensagemArgumentCaptor;
 
     // Instanciando classes mockito
     // Sempre a cada novo teste será instanciado um novo mock
@@ -74,6 +75,19 @@ class CadastroEditorComMockComAnotacoesTest {
                 // Verificando se não passou no enviarEmail
                 () -> Mockito.verify(gerenciadorEnvioEmailMock, Mockito.never()).enviarEmail(Mockito.any()));
         // Sem o assertAll ele lança exceção e não chega no verify
+    }
+
+    @Test
+    void Dado_um_editor_valido_Quando_cadastrar_Entao_deve_enviar_email_com_destino_ao_editor() {
+        //ArgumentCaptor<Mensagem> mensagemArgumentCaptor = ArgumentCaptor.forClass(Mensagem.class);
+
+        Editor editorSalvo = cadastroEditor.criar(editor);
+
+        Mockito.verify(gerenciadorEnvioEmailMock).enviarEmail(mensagemArgumentCaptor.capture());
+
+        Mensagem mensagem = mensagemArgumentCaptor.getValue();
+
+        assertEquals(editorSalvo.getEmail(), mensagem.getDestinatario());
     }
 
 }
