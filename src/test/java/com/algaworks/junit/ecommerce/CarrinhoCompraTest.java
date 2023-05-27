@@ -239,7 +239,7 @@ class CarrinhoCompraTest {
             }
 
             @Test
-            @DisplayName("E retornar valor total correto de itens")
+            @DisplayName("Então deve retornar valor total correto de itens")
             void eRetornarValorTotalItens() {
                 assertEquals(new BigDecimal("18"), carrinho.getValorTotal());
             }
