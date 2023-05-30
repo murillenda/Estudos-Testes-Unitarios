@@ -16,7 +16,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class CadastroEditorComMockComAnotacoesTest {
 
-    Editor editor;
+    @Spy
+    Editor editor = new Editor(null, "Murillo", "murillo@email.com", BigDecimal.TEN, true);
 
     @Captor
     ArgumentCaptor<Mensagem> mensagemArgumentCaptor;
@@ -35,8 +36,6 @@ class CadastroEditorComMockComAnotacoesTest {
 
     @BeforeEach
     void init() {
-        editor = new Editor(null, "Murillo", "murillo@email.com", BigDecimal.TEN, true);
-
         // Mockito.any é muito útil em diversos casos principalmente quando temos muitos parâmetros
         // nos métodos que estamos realizando o mock
         Mockito.when(armazenamentoEditorMock.salvar(Mockito.any(Editor.class)))
@@ -88,6 +87,16 @@ class CadastroEditorComMockComAnotacoesTest {
         Mensagem mensagem = mensagemArgumentCaptor.getValue();
 
         assertEquals(editorSalvo.getEmail(), mensagem.getDestinatario());
+    }
+
+    @Test
+    void Dado_um_editor_valido_Quando_cadastrar_Entao_deve_verificar_o_email() {
+        // Editor editorSpy = Mockito.spy(editor);
+        // cadastroEditor.criar(editorSpy);
+        cadastroEditor.criar(editor);
+        // atLeast verificamos se o getEmail foi chamado pelo menos uma vez no teste de criação
+        // Mockito.verify(editorSpy, Mockito.atLeast(1)).getEmail();
+        Mockito.verify(editor, Mockito.atLeast(1)).getEmail();
     }
 
 }
